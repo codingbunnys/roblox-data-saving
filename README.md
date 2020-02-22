@@ -13,4 +13,7 @@ Setting up _RDS_ is pretty simple. <br>
 5. ***important to not have 0 security:*** Set the AUTHENTICATION token to some random string in the index.js file - cannot include any path manipulating/etc... characters (like `/`, `#` or `?`)
 6. Copy said authentication token over to the Modulescript.
 7. Remove robloxfile.lua if you want.
-8. You're done! Congrats!
+8. Set the apiserver variable to either<br>
+(a) Your server's DNS address<br>
+(b) Your server's IP
+9. You're done! Congrats!
