@@ -1,7 +1,8 @@
 # RobloxData (aka RobloxDataSaving/RDS)
 ## An Alternative to Datastores
 ### About
-RDS allows you, and I mean ***__YOU__*** to save your data on your server
+RDS allows you to save your data on your server without relying on DataStores<br><br>
+Intended for ROBLOX specific usage, but if you ignore the roblox steps below and you write your own code for something else, that will work too
 
 
 ### Setting up
