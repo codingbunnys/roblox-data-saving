@@ -4,14 +4,19 @@
 */
 
 // Config
-const port = 3000
+const port = "42168"
 const time = 1 // Save Interval
 const auth = "Example*Token." // Auth String - this gets compared with the one sent, and if equal, sets data
+const host = "localhost" // Hostname
+
 
 // DO NOT CHANGE
 const version = "0.0.0"
 
 // Code
+const fs = require("fs");
+
+
 console.log("RobloxData v" + version + " - External server software to replace datastores.\nCopyright (c) 2017-2020 TStudios.\nLicensed under the AGPL 3.0 only.\nNotice: This code is meant to run on a server.")
 
 if (process.argv[2] === "-t") {
@@ -23,7 +28,6 @@ var deps = {}
 try {
   deps.chalk = require('chalk')
   deps.express = require('express')
-  deps.fs = require('fs');
 } catch (e) {
   if (!deps.chalk) {
     deps.chalk={
@@ -34,8 +38,8 @@ try {
   }
   console.log(deps.chalk.red("Failed to load dependencies.\n=======================\nError:\n\n" + e))
 }
-const fs = deps.fs
-const app = deps.express()
+const express = deps.express
+const app = express()
 var dat = {}
 
 try {

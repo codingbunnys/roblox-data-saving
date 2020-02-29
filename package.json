@@ -24,6 +24,7 @@
   },
   "homepage": "https://gitlab.com/TStudios/roblox-data-saving#readme",
   "dependencies": {
+    "express": "^4.17.1",
     "npm-check-updates": "^4.0.1"
   }
 }

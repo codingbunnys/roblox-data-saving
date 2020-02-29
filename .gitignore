@@ -2,3 +2,4 @@
 # GitIgnore #
 #############
 data.json
+*.pem
