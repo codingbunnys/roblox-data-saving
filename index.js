@@ -128,7 +128,11 @@ app.get('/utctime', function(req, res) {
 	let t = d.getUTCHours() + ":" + `${d.getUTCMinutes()}:${d.getUTCSeconds()}`
 	res.send({ "time":t, "unix":unixtime })
 })
-
+app.all('*', function(req, res) {
+	if (req.protocol == "https") {
+		res.redirect("http://" + req.headers["host"] + req.url);
+	}
+})
 debugger;
 function help() {
 	if (saving == true || ctrlc == true) {
