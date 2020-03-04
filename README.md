@@ -20,3 +20,6 @@ Setting up _RDS_ is pretty simple. <br>
 9. You're done! Congrats!
 
 <br> Just run `node .` to run the server again if you shut it down!<br>
+
+
+*The core part of the readme is correct, although it still needs to be fixed up as release 0.0.1 added multi-game-support*

@@ -3,10 +3,20 @@
   Licensed under the AGPL 3.0 only.
 */
 
+/*
+	Special Errors:
+		299 - Deprecated
+		499 - Deprecated + 400
+		599 - Deprecated + 500
+*/
+
 // Config
 const port  = "25565"; // Deal with it, yes I'm using the standard minecraft port since im too lazy to change the opened port on my server
 const time  = 0.2 // Save Interval
-const auth  = "Example*Token." // Auth String - this gets compared with the one sent, and if equal, sets data
+const auth  = {
+	"Default_Game": "Example*Token.",
+	"Additional_Game": "Secondary*Token", // For the second game
+} // Auth String - this gets compared with the one sent, and if equal, sets data
 // const host = "localhost" // Hostname
 
 
@@ -34,7 +44,7 @@ const auth  = "Example*Token." // Auth String - this gets compared with the one 
 
 
 // DO NOT CHANGE
-const version = "0.0.0"
+const version = "0.0.1"
 
 
 
@@ -80,18 +90,31 @@ app.post('*', function(req, res) {
 	res.send("***POST REQUESTS CANNOT BE MADE***\nWe do not support post requests. Even for setting data, we use GET requests")
 })
 
+
+// Set Data
+
 app.get('/setdat/', function(req, res) {
 	console.log("NetLog | SetDat 400");
-	res.send({ "error":true, "text":"400 Invalid Request", "Info": "URL Format: /setdat/Auth/Data" })
+	res.send({ "error":true, "text":"400 Invalid Request", "Info": "URL Format: /setdat/{Game}/Auth/Data" })
 })
 
 app.get('/setdat/:id', function(req, res) {
 	console.log("NetLog | SetDat 400");
-	res.send({ "error":true, "text":"400 Invalid Request", "Info": "URL Format: /setdat/" + req.params.id + "/Data" })
+	res.send({ "error":true, "text":"400 Invalid Request", "Info": "URL Format: /setdat/" + req.params.id + "/{game}/Data" })
 })
 
-app.get('/setdat/:id/:data', function(req, res) {
-	if (req.params.id != auth) {
+
+// 0.0.1
+
+app.get('/setdat/:id/:game/:data', function(req, res) {
+	if (!req.params.game) {
+		console.log("NetLog | SetDat 400 | No Game");
+		return res.send({ "error":true, "text":"No Game String." })
+	}
+	if (!auth[req.params.game]) {
+		return res.send({ "error":true, "text":"ERROR: Invalid Game" })
+	}
+	if (req.params.id != auth[req.params.game]) {
 		console.log("NetLog | SetDat 400 | Invalid Auth");
 		return res.send({ "error":true, "text":"INVALID AUTHENTICATION TOKEN!" })
 	}
@@ -101,9 +124,40 @@ app.get('/setdat/:id/:data', function(req, res) {
 		return res.send({ "error":true, "text":"No User ID String." })
 	}
 	console.log("NetLog | SetDat Success - UserID: " + string.userid);
-	dat[string.userid] = string
+	if (!dat[req.params.game]) {
+		dat[req.params.game] = { '0':{} }
+	}
+	dat[req.params.game][string.userid] = string
 	changed = true
-	res.send({ "error":false, "text":"Success!" })
+	res.send({ "error":false, "text":"Success" })
+})
+
+
+// 0.0.0 Support
+app.get('/setdat/:id/:data', function(req, res) {
+	if (!auth.Default_Game) {
+		res.status(599)
+		return res.send({ "error":true, "text":"ERROR: v0.0.0 Is unsupported and default game not found (backwards compatability failed)" })
+	}
+	if (req.params.id != auth.Default_Game) {
+		res.status(499)
+		console.log("NetLog | SetDat 499 | Invalid Auth");
+		return res.send({ "error":true, "text":"INVALID AUTHENTICATION TOKEN! (and v0.0.0 which is unsupported)" })
+	}
+	res.status(299)
+	let string = JSON.parse(req.params.data)
+	if (!string.userid) {
+		res.status(499)
+		console.log("NetLog | SetDat 499 | No UserID");
+		return res.send({ "error":true, "text":"No User ID String." })
+	}
+	console.log("NetLog | SetDat Success from OUTDATED CLIENT - UserID: " + string.userid);
+	if (!dat["Default_Game"]) {
+		dat["Default_Game"] = { "0":{} }
+	}
+	dat["Default_Game"][string.userid] = string
+	changed = true
+	res.send({ "error":false, "text":"WARNING: Using Outdated Client", "url_used": "/" + req.params.id + "/Default_Game/" + req.params.data })
 })
 
 app.get('/', function(req, res) {
@@ -111,12 +165,32 @@ app.get('/', function(req, res) {
 	res.send({ "error":true, "text":"Error: Invalid Path" })
 })
 
-// NO AUTH for getting data
+// NO AUTH for getting data \\
+
+// Version 0.0.0 Support
 app.get('/getdat/:userid', function(req, res) {
-	if (!dat[req.params.userid]) {
+	if (!dat["Default_Game"]) {
+		res.status(499)
+		return res.send({ "error":true, "exists":false, "game_exists":false, "errormsg":"NO_DATA_IN_DEFAULT", "text":"Client probs does not understand - version 0.0.0 detected - ERROR: NO DATA IN GAME" })
+	}
+	if (!dat["Default_Game"][req.params.userid]) {
 		return res.send({ "error":false, "exists":false, "text":"DATA does not exist." })
 	}
-	res.send({ "error":false, "text":"Data in DATA variable", "exists":true, "data": dat[req.params.userid] })
+	res.status(299)
+	res.send({ "error":false, "text":"Data in DATA variable | OUTDATED_CLIENT", "outdated":true, "exists":true, "data": dat["Default_Game"][req.params.userid] })
+})
+
+// Version 0.0.1
+app.get('/getdat/:game/:userid', function(req, res) {
+	let game = req.params.game
+	let userid = req.params.userid
+	if (!dat[game]) {
+		return res.send({ "error":true, "game_exists":false, "text":"GAME does not exist." })
+	}
+	if (!dat[game][req.params.userid]) {
+		return res.send({ "error":false, "game_exists": true, "data_exists":false, "text":"DATA does not exist." })
+	}
+	res.send({ "error":false, "text":"Data in DATA variable", "exists":true, "data": dat[game][userid] })
 })
 
 
@@ -127,11 +201,6 @@ app.get('/utctime', function(req, res) {
 	let unixtime = new Date(d.toUTCString()).toUnixTime()
 	let t = d.getUTCHours() + ":" + `${d.getUTCMinutes()}:${d.getUTCSeconds()}`
 	res.send({ "time":t, "unix":unixtime })
-})
-app.all('*', function(req, res) {
-	if (req.protocol == "https") {
-		res.redirect("http://" + req.headers["host"] + req.url);
-	}
 })
 debugger;
 function help() {
@@ -194,7 +263,7 @@ function save(exit, force) {
 		}
 		saving = false
 		savingexit = false // why? idk
-	}, 1000);
+	}, 100);
 }
 let x = ""
 function getTime() {
