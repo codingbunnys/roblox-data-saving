@@ -51,6 +51,11 @@ const version = "0.0.1"
 // Code
 const fs = require("fs")
 
+// INIT SENTRY
+const Sentry = require('@sentry/node');
+Sentry.init({ dsn: 'https://e599daf252d3425493d20c4df93508a2@sentry.io/5174404' });
+
+
 Date.prototype.toUnixTime = function() { return this.getTime() / 1000 | 0 };
 
 
