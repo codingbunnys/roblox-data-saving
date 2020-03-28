@@ -1,5 +1,6 @@
 # RobloxData (aka RobloxDataSaving/RDS)
 ## An Alternative to Datastores
+[![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=codingbunnys/roblox-data-saving)](https://dependabot.com)
 ### About
 RDS allows you to save your data on your server without relying on DataStores<br><br>
 Intended for ROBLOX specific usage, but if you ignore the roblox steps below and you write your own code for something else, that will work too
