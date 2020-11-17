@@ -26,6 +26,6 @@
   "dependencies": {
     "@sentry/node": "^5.15.4",
     "express": "^4.17.1",
-    "npm-check-updates": "^4.1.2"
+    "npm-check-updates": "^10.2.1"
   }
 }
